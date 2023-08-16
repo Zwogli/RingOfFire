@@ -1,1 +1,18 @@
-<p>game works!</p>
+<div class="field">
+
+  <div class="card-stack">
+
+    <!--
+      [ngStyle] = new Style Propertie (same ass css class), {} = (postion).(value) right.px: i = array count 1px, 2px, 3px
+      ngfor = for-loop, c = Variable, [] = array => Repeat 5x img-Tag
+    -->
+    <img [ngStyle]="{'right.px': i * 5}"
+    *ngFor="let c of [0, 1, 2, 3,]; let i = index;" 
+    src="/assets/img/cards/card_cover.png" alt="card-cover"> 
+
+    <!-- (click) = onCLick function, [class.selection] = if requirement -->
+    <img (click)="takeCard()" [class.pick-card]="pickCardAnimation" class="top-card" style="right: 25px;"
+    src="/assets/img/cards/card_cover.png" alt="card-cover"> 
+  </div>
+
+</div>
