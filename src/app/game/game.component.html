@@ -1,4 +1,10 @@
-<app-player style="top: 130px;" class="player-position"></app-player>
+<app-player
+  *ngFor="let player of game.players; let i = index;"
+  [ngStyle]="{ 'top.px': 100 + (i * 120) }"
+  [name]= "player"
+  style="top: 130px"
+  class="player-position"
+></app-player>
 
 <div class="field">
   <div class="card-stack">
@@ -8,8 +14,8 @@
       ngfor = for-loop, c = Variable, [] = array => Repeat 5x img-Tag
     -->
     <img
-      [ngStyle]="{ 'right.px': i * 5 }"
-      *ngFor="let c of [0, 1, 2, 3]; let i = index"
+    *ngFor="let c of [0, 1, 2, 3]; let i = index"
+    [ngStyle]="{ 'right.px': i * 5 }"
       src="/assets/img/cards/card_cover.png"
       alt="card-cover"
     />
