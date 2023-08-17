@@ -31,8 +31,6 @@ export class GameComponent {
       this.currentCard = this.game.stack.pop(); // pop() =  read and delete the last array position
       this.pickCardAnimation = true;
 
-      console.log(this.game);
-
       this.game.currentPlayer++;
       this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
       setTimeout(() => {
