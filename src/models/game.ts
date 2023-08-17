@@ -1,5 +1,5 @@
 export class Game {
-  public players: string[] = ['Hans', 'Klaus', 'Peter', 'Jim']; // variable : validation, string[] = string typ of array
+  public players: string[] = []; // variable : validation, string[] = string typ of array
   public stack: string[] = [];
   public playedCard: string[] = [];
   public currentPlayer: number = 0;
