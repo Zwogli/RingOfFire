@@ -32,7 +32,6 @@ export class GameComponent {
 
       setTimeout(() => {
         this.game.playedCard.push(this.currentCard);
-        console.log('New Card: ' + this.currentCard);
         this.pickCardAnimation = false;
       }, 1000);
     }
