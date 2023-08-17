@@ -19,7 +19,6 @@ export class GameComponent {
 
   newGame() {
     this.game = new Game();
-    console.log(this.game);
   }
 
   takeCard() {
@@ -27,9 +26,13 @@ export class GameComponent {
       this.currentCard = this.game.stack.pop(); // pop() =  read and delete the last array position
       this.pickCardAnimation = true;
 
+      console.log(this.game);
+
       setTimeout(() => {
+        this.game.playedCard.push(this.currentCard);
+        console.log('New Card: ' + this.currentCard);
         this.pickCardAnimation = false;
-      }, 1800);
+      }, 1000);
     }
   }
 }

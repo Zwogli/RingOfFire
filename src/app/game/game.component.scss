@@ -26,10 +26,15 @@
   }
 }
 
+.playerd-card{
+  right: 25px;
+  transform: scale(1) translateX(180px) translateY(-320px) rotate(15deg);
+}
+
 .pick-card{
   transition: all ease-in-out 125ms;
-  animation: pick-card-animation 1.5s ease-in-out;
-  transform: scale(1) translateX(180px) translatey(-300px) rotate(15deg);
+  animation: pick-card-animation 1s ease-in-out;
+  transform: scale(1) translateX(180px) translateY(-320px) rotate(15deg);
 }
 
 @keyframes pick-card-animation{
@@ -45,7 +50,7 @@
   100%{
     transform: scale(1) 
     translateX(180px) 
-    translatey(-300px)
+    translateY(-320px)
     rotate(15deg);
   }
 }
