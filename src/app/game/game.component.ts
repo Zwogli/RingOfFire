@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Game } from 'src/models/game';
 import {MatDialog} from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
+import { Observable } from 'rxjs';
+import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
+import { collectionData } from '@angular/fire/firestore';
+import { addDoc } from 'firebase/firestore';
 
 @Component({
   selector: 'app-game',
@@ -9,11 +13,19 @@ import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player
   styleUrls: ['./game.component.scss'],
 })
 export class GameComponent {
+  item$: Observable<any>;
+  firestore: Firestore = inject(Firestore);
   pickCardAnimation = false;
   currentCard: string = '';
   game: Game; // variable : Typ Game
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog) {
+    const itemCollection = collection(this.firestore, 'games');
+    this.item$ = collectionData(itemCollection);
+    this.item$.subscribe((game) => {
+      console.log('game Status', game);
+    });
+  }
 
   ngOnInit() {
     this.newGame();
@@ -21,6 +33,19 @@ export class GameComponent {
 
   newGame() {
     this.game = new Game();
+    this.create();
+    
+  }
+
+  /**
+   * CRUD: Create = addDoc, Read, Update = setDoc, Delete
+   * addDoc save {'key':'value}
+   */
+  create(){
+    const coll = collection(this.firestore, 'games'); // select firebase collection = *dt. sammlung*
+    addDoc(coll, {game: this.game.toJson()}).then((gameInfo:any ) =>{
+      console.log(gameInfo);
+    });
   }
 
   /**

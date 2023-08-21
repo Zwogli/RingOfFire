@@ -14,6 +14,15 @@ export class Game {
     this.shuffle(this.stack);
   }
 
+  public toJson(){
+    return{
+      players: this.players,
+      stack: this.stack,
+      playedCard: this.playedCard,
+      currentPlayer: this.currentPlayer
+    }
+  }
+
   /**
    * Shuffles array in place.
    * @param {Array} a - items An array containing the items.
