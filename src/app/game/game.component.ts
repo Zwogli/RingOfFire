@@ -3,9 +3,9 @@ import { Game } from 'src/models/game';
 import {MatDialog} from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { Observable } from 'rxjs';
-import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, doc, docData, setDoc } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
-import { addDoc, getDoc, onSnapshot } from 'firebase/firestore';
+import { addDoc, updateDoc } from 'firebase/firestore';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -13,53 +13,53 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss'],
 })
-
 export class GameComponent {
+  item$: Observable<any>;
   firestore: Firestore = inject(Firestore);
-  games$: Observable<any>;
-  games: Array<string> = [];
-  public currentGameId!: string;
-  public currentGame!: any;
-
   pickCardAnimation = false;
   currentCard: string = '';
-  game!: Game; // variable : Typ Game
-  itemCollection: any;
+  public gameId: string;
+  game: Game; // variable : Typ Game
 
   constructor(private route: ActivatedRoute, public dialog: MatDialog) {
-    this.itemCollection = collection(this.firestore, 'games');
-    this.games$ = collectionData(this.itemCollection);
+    const itemCollection = collection(this.firestore, 'games');
+    this.item$ = collectionData(itemCollection);
+    this.item$.subscribe((game) => {
+      console.log('All games', game);
+    });
   }
 
-  ngOnInit() {
-    this.loadGame();
-    this.updateGame();
-    this.route.params.subscribe((params) =>{
-      console.log(params);
+  async ngOnInit() {
+    this.newGame();
+    this.route.params.subscribe((params)=>{
+      this.gameId = params['id'];
+      const itemDoc = doc(this.firestore, 'games', this.gameId);
+      
+      docData(itemDoc).subscribe((game: any) => {
+        //update Game
+        this.game.players = game.game.players;
+        this.game.currentPlayer = game.game.currentPlayer;
+        this.game.stack = game.game.stack;
+        console.log(`update game: `,game, `gameID: ${this.gameId}`,itemDoc);
+      });
     })
   }
 
-  async loadGame() {
-    this.currentGameId = this.route.snapshot.url[1].path;
-    const docRef = doc(this.firestore, "games", this.currentGameId);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      this.currentGame = docSnap.data();
-      this.game = this.currentGame;
-    } else {
-      // docSnap.data() will be undefined in this case
-      console.log("No such document!");
-    }
+  newGame() {
+    this.game = new Game();
+    // this.create();
   }
 
-  async updateGame() {
-    this.currentGame = onSnapshot(doc(this.firestore, "games", this.currentGameId), (doc) => {
-      console.log("Current data: ", doc.data());
-      this.currentGame = doc.data();
-      this.game = this.currentGame;
-    });
-  }
+  /**
+   * CRUD: Create = addDoc, Read, Update = setDoc, Delete
+   * addDoc save {'key':'value}
+   */
+  // create(params){
+  //   const coll = collection(this.firestore, 'games', params); // select firebase collection = *dt. sammlung*
+  //   addDoc(coll, {game: this.game.toJson()}).then((gameInfo:any ) =>{
+  //     console.log(gameInfo);
+  //   });
+  // }
 
   /**
    * Modulo "%" = rest operator
@@ -87,5 +87,12 @@ export class GameComponent {
       }
     });
   }
+
+  updateGame() {
+    const itemDoc = doc(this.firestore, 'games', this.gameId);
+    updateDoc(itemDoc, this.game.toJson());
+  }
+
 }
+
 
