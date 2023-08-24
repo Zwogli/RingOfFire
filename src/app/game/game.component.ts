@@ -3,9 +3,7 @@ import { Game } from 'src/models/game';
 import {MatDialog} from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { Observable } from 'rxjs';
-import { Firestore, collection, doc, docData, setDoc } from '@angular/fire/firestore';
-import { collectionData } from '@angular/fire/firestore';
-import { addDoc, updateDoc } from 'firebase/firestore';
+import { Firestore, arrayUnion, collection, collectionData, doc, docData, updateDoc} from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -18,18 +16,18 @@ export class GameComponent {
   firestore: Firestore = inject(Firestore);
   pickCardAnimation = false;
   currentCard: string = '';
-  public gameId: string;
+  gameId: string;
   game: Game; // variable : Typ Game
 
   constructor(private route: ActivatedRoute, public dialog: MatDialog) {
     const itemCollection = collection(this.firestore, 'games');
     this.item$ = collectionData(itemCollection);
     this.item$.subscribe((game) => {
-      console.log('All games', game);
+      console.log('gameInfo', game);
     });
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.newGame();
     this.route.params.subscribe((params)=>{
       this.gameId = params['id'];
@@ -40,7 +38,6 @@ export class GameComponent {
         this.game.players = game.game.players;
         this.game.currentPlayer = game.game.currentPlayer;
         this.game.stack = game.game.stack;
-        console.log(`update game: `,game, `gameID: ${this.gameId}`,itemDoc);
       });
     })
   }
@@ -56,12 +53,15 @@ export class GameComponent {
     if (!this.pickCardAnimation) {
       this.currentCard = this.game.stack.pop(); // pop() =  read and delete the last array position
       this.pickCardAnimation = true;
+      this.saveGame();
 
       this.game.currentPlayer++;
       this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
       setTimeout(() => {
         this.game.playedCard.push(this.currentCard);
         this.pickCardAnimation = false;
+        this.saveGame();
+
       }, 1000);
     }
   }
@@ -71,12 +71,13 @@ export class GameComponent {
 
     dialogRef.afterClosed().subscribe(name => {
       if (name && name.length > 0) {
-        this.game.players.push(name)
+        this.game.players.push(name);
+        this.saveGame();
       }
     });
   }
 
-  updateGame() {
+  async saveGame() {
     const itemDoc = doc(this.firestore, 'games', this.gameId);
     updateDoc(itemDoc, this.game.toJson());
   }
