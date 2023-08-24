@@ -3,7 +3,7 @@ import { Game } from 'src/models/game';
 import {MatDialog} from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { Observable } from 'rxjs';
-import { Firestore, arrayUnion, collection, collectionData, doc, docData, updateDoc} from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, docData, updateDoc} from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -14,8 +14,6 @@ import { ActivatedRoute } from '@angular/router';
 export class GameComponent {
   item$: Observable<any>;
   firestore: Firestore = inject(Firestore);
-  pickCardAnimation = false;
-  currentCard: string = '';
   gameId: string;
   game: Game; // variable : Typ Game
 
@@ -38,6 +36,8 @@ export class GameComponent {
         this.game.players = game.game.players;
         this.game.currentPlayer = game.game.currentPlayer;
         this.game.stack = game.game.stack;
+        this.game.pickCardAnimation = game.game.pickCardAnimation;
+        this.game.currentCard = game.game.currentCard;
       });
     })
   }
@@ -50,16 +50,16 @@ export class GameComponent {
    * Modulo "%" = rest operator
    */
   takeCard() {
-    if (!this.pickCardAnimation) {
-      this.currentCard = this.game.stack.pop(); // pop() =  read and delete the last array position
-      this.pickCardAnimation = true;
-      this.saveGame();
-
+    if (!this.game.pickCardAnimation) {
+      this.game.currentCard = this.game.stack.pop(); // pop() =  read and delete the last array position
+      this.game.pickCardAnimation = true;
       this.game.currentPlayer++;
       this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
-      setTimeout(() => {
-        this.game.playedCard.push(this.currentCard);
-        this.pickCardAnimation = false;
+      this.saveGame();
+
+      setTimeout(async () => {
+        this.game.playedCard.push(this.game.currentCard);
+        this.game.pickCardAnimation = false;
         this.saveGame();
 
       }, 1000);
@@ -69,7 +69,7 @@ export class GameComponent {
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogAddPlayerComponent);
 
-    dialogRef.afterClosed().subscribe(name => {
+    dialogRef.afterClosed().subscribe(async name => {
       if (name && name.length > 0) {
         this.game.players.push(name);
         this.saveGame();
@@ -77,9 +77,11 @@ export class GameComponent {
     });
   }
 
-  async saveGame() {
+  saveGame() {
     const itemDoc = doc(this.firestore, 'games', this.gameId);
-    updateDoc(itemDoc, this.game.toJson());
+    updateDoc(itemDoc, {game: this.game.toJson()}).then(() =>{
+      console.log('update game', this.game);
+    });
   }
 
 }
