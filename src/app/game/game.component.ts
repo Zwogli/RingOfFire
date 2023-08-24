@@ -47,19 +47,7 @@ export class GameComponent {
 
   newGame() {
     this.game = new Game();
-    // this.create();
   }
-
-  /**
-   * CRUD: Create = addDoc, Read, Update = setDoc, Delete
-   * addDoc save {'key':'value}
-   */
-  // create(params){
-  //   const coll = collection(this.firestore, 'games', params); // select firebase collection = *dt. sammlung*
-  //   addDoc(coll, {game: this.game.toJson()}).then((gameInfo:any ) =>{
-  //     console.log(gameInfo);
-  //   });
-  // }
 
   /**
    * Modulo "%" = rest operator

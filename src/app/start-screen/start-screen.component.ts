@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router'; //! need constructor!
-import { Firestore, addDoc, collection } from 'firebase/firestore';
+import { Firestore, addDoc, collection } from '@angular/fire/firestore';
 import { Game } from 'src/models/game';
 
 @Component({
@@ -9,20 +9,18 @@ import { Game } from 'src/models/game';
   styleUrls: ['./start-screen.component.scss']
 })
 export class StartScreenComponent {
-
-  constructor(private router: Router, private firestore: Firestore){}
-  game!: Game;
+  firestore: Firestore = inject(Firestore);
   collectionInstance = collection(this.firestore, 'games');
 
+  constructor(private router: Router){}
+
   newGame(){
-    this.game = new Game(); // create new Object
-    addDoc(this.collectionInstance, this.game.toJson()).then((docRef) => {
-      // Needs to be called docRef and points to the just created document
-      console.log(docRef.id);
-      console.log('Game created');
-      this.router.navigateByUrl('/game/' + docRef.id); // Url = /game/id
-    }).catch((err) => {
-      console.log(err);
-    }); 
+    let game = new Game();
+
+    const coll = collection(this.firestore, 'games'); // select firebase collection = *dt. sammlung*
+    addDoc(coll, {game: game.toJson()}).then((gameInfo:any ) =>{  // .then = only one call
+      console.log(gameInfo.id);
+      this.router.navigateByUrl('/game/' + gameInfo.id); // Url = /game/id
+    });
   }
 }
