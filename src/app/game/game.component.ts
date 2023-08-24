@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { Game } from 'src/models/game';
 import {MatDialog} from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { Observable } from 'rxjs';
 import { Firestore, collection, collectionData, doc, docData, updateDoc} from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
+import { update } from 'firebase/database';
 
 @Component({
   selector: 'app-game',
@@ -17,7 +18,7 @@ export class GameComponent {
   gameId: string;
   game: Game; // variable : Typ Game
 
-  constructor(private route: ActivatedRoute, public dialog: MatDialog) {
+  constructor(private route: ActivatedRoute, public dialog: MatDialog, private cd: ChangeDetectorRef) {
     const itemCollection = collection(this.firestore, 'games');
     this.item$ = collectionData(itemCollection);
     this.item$.subscribe((game) => {
@@ -38,8 +39,13 @@ export class GameComponent {
         this.game.stack = game.game.stack;
         this.game.pickCardAnimation = game.game.pickCardAnimation;
         this.game.currentCard = game.game.currentCard;
+        this.update();
       });
     })
+  }
+
+  update(){
+      this.cd.detectChanges();
   }
 
   newGame() {
