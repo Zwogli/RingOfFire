@@ -38,6 +38,7 @@ export class GameComponent {
         this.game.stack = game.game.stack;
         this.game.pickCardAnimation = game.game.pickCardAnimation;
         this.game.currentCard = game.game.currentCard;
+        this.game.playedCard = game.game.playedCard;
       });
     })
   }
@@ -57,7 +58,7 @@ export class GameComponent {
       this.game.currentPlayer = this.game.currentPlayer % this.game.players.length;
       this.saveGame();
 
-      setTimeout(async () => {
+      setTimeout(() => {
         this.game.playedCard.push(this.game.currentCard);
         this.game.pickCardAnimation = false;
         this.saveGame();
@@ -77,13 +78,13 @@ export class GameComponent {
     });
   }
 
-  saveGame() {
+  async saveGame() {
     const itemDoc = doc(this.firestore, 'games', this.gameId);
-    updateDoc(itemDoc, {game: this.game.toJson()}).then(() =>{
-      console.log('update game', this.game);
-    });
+    await updateDoc(itemDoc, { game: this.game.toJson() });
+    console.log('update game', this.game);
+
+  //   const documentReference = doc(this.firestore, `games/${this.gameId}`);
+  //   return docData(documentReference, { game: this.game.toJson()});
+  // }
   }
-
 }
-
-
